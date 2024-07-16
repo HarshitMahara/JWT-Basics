@@ -7,21 +7,31 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
+
 app.use(express.json());
+app.use(express.static("./public"));
 
 app.get("/", (req, res) => {
   res.send("<h1>JWT BASICS</h1>");
 });
 
-app.use(notFound)
-app.use(errorHandler)
+// Middleware to handle 404 not found
+app.use(notFound);
 
-(async () => {
+// Error handling middleware
+app.use(errorHandler);
+
+const startServer = async () => {
   try {
     await dbConnect(process.env.MONGO_URL);
     console.log(`Database Connected...`);
-    app.listen(port, console.log(`Server is running...`));
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}...`);
+    });
   } catch (error) {
     console.log("Error in DB Connect", error);
   }
-})();
+};
+
+// Start the server
+startServer();
